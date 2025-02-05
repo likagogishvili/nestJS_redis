@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateRedisDto {
+export class RedisDataDto {
   @ApiProperty({ example: 'John', description: 'First name of the user' })
   name: string;
 
