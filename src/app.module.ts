@@ -5,12 +5,14 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
 import { RedisOptions } from './redis/constants/redis-options.constants';
 import { RedisModule } from './redis/redis.module';
+import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     CacheModule.registerAsync(RedisOptions),
     RedisModule,
+    CalendarEventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
