@@ -4,9 +4,11 @@ import { UpdateCalendarEventDto } from './dto/update-calendar-event.dto';
 
 @Injectable()
 export class CalendarEventsService {
-  create(createCalendarEventDto: CreateCalendarEventDto) {
-    return 'This action adds a new calendarEvent';
+  async create(createCalendarEventDto: CreateCalendarEventDto) {
+    // this.client.emit('calendarEventCreated', createCalendarEventDto);
+    return 'Event created and notification sent';
   }
+
 
   findAll() {
     return `This action returns all calendarEvents`;

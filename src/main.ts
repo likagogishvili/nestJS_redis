@@ -24,6 +24,8 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
   options: {
     host: 'localhost',
     port: 6379,
+    wildcards: true,
+
   },
 });
 
