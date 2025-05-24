@@ -1,11 +1,10 @@
 import { Controller, Get, Post, Body, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RedisService } from './redis.service';
-import { CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { CreateRedisDto } from './dto/create-redi.dto';
 import { RedisDataDto } from './dto/redis-data.dto';
 
-@ApiTags('Redis') // Group routes under "Redis" in Swagger
+@ApiTags('Redis')
 @Controller('redis')
 export class RedisController {
   constructor(private readonly redisService: RedisService) {}
@@ -17,14 +16,12 @@ export class RedisController {
     description: 'Returns stored Redis data',
     type: RedisDataDto,
   })
-  @CacheKey('custom_key')
-  @CacheTTL(20)
-  async getData(): Promise<RedisDataDto | undefined> {
+  async getData(): Promise<RedisDataDto | null> {
     try {
       return await this.redisService.getData();
     } catch (error) {
-      console.log(error);
-      return error;
+      console.error('Error getting data from Redis:', error);
+      return null;
     }
   }
 
@@ -33,10 +30,10 @@ export class RedisController {
   @ApiResponse({ status: 201, description: 'Stores an object in Redis' })
   async postData(@Body() createDataDto: CreateRedisDto) {
     try {
-      return await this.redisService.postData(createDataDto);
+      return await this.redisService.setData(createDataDto);
     } catch (error) {
-      console.log(error);
-      return error;
+      console.error('Error setting data in Redis:', error);
+      return { error: 'Failed to store data' };
     }
   }
 
@@ -47,8 +44,14 @@ export class RedisController {
     try {
       return await this.redisService.deleteData();
     } catch (error) {
-      console.log(error);
-      return error;
+      console.error('Error deleting data in Redis:', error);
+      return { error: 'Failed to delete data' };
     }
+  }
+
+  @Get('/keys')
+  @ApiOperation({ summary: 'Get all Redis keys' })
+  async getKeys() {
+    return this.redisService.getKeys();
   }
 }

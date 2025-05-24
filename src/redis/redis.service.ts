@@ -1,24 +1,28 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { Injectable } from '@nestjs/common';
+import Redis from 'ioredis';
 import { RedisDataDto } from './dto/redis-data.dto';
 
 @Injectable()
 export class RedisService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) { }
+  private readonly redisClient = new Redis({ host: '127.0.0.1', port: 6379 });
 
-  async getData(): Promise<RedisDataDto | undefined> {
-    const value = await this.cacheManager.get<RedisDataDto>('customer');
-    return value;
+  async setData(data: RedisDataDto) {
+    await this.redisClient.set('customer', JSON.stringify(data));
+    return { message: 'Data stored in Redis' };
   }
 
-  async postData(createDataDto: RedisDataDto) {
-    await this.cacheManager.set('customer', createDataDto, 0);
-    return { message: 'Data stored successfully' };
+  async getData(): Promise<RedisDataDto | null> {
+    const value = await this.redisClient.get('customer');
+    return value ? JSON.parse(value) : null;
   }
 
   async deleteData() {
-    await this.cacheManager.del('customer');
-    return { message: 'Data deleted successfully' };
+    await this.redisClient.del('customer');
+    return { message: 'Data deleted from Redis' };
+  }
+
+  async getKeys() {
+    const keys = await this.redisClient.keys('*');
+    return keys;
   }
 }
