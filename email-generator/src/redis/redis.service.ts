@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 import { RedisDataDto } from './dto/redis-data.dto';
+import { redisHostPort, ttlSeconds } from './constants/redi-port-host';
 
 @Injectable()
 export class RedisService {
-  private readonly redisClient = new Redis({ host: '127.0.0.1', port: 6379 });
+  private readonly redisClient = new Redis(redisHostPort);
 
-  async setData(data: RedisDataDto) {
-    await this.redisClient.set('customer', JSON.stringify(data));
-    return { message: 'Data stored in Redis' };
+  async setData(key: string, data: any) {
+    await this.redisClient.set(key, JSON.stringify(data), 'EX', ttlSeconds);
+    return { message: `Data stored in Redis under key '${key}'` };
   }
 
   async getData(): Promise<RedisDataDto | null> {
@@ -21,8 +22,7 @@ export class RedisService {
     return { message: 'Data deleted from Redis' };
   }
 
-  async getKeys() {
-    const keys = await this.redisClient.keys('*');
-    return keys;
+  async getKeys(pattern = '*'): Promise<string[]> {
+    return this.redisClient.keys(pattern);
   }
 }

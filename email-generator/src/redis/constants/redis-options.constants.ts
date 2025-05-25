@@ -10,7 +10,7 @@ export const RedisOptions: CacheModuleAsyncOptions = {
     const port = parseInt(configService.get<string>('REDIS_PORT'), 10);
 
     console.log(
-      `🧠 Redis connecting to ${host ?? '[undefined]'}:${port ?? '[undefined]'}`,
+      `Redis connecting to ${host ?? '[undefined]'}:${port ?? '[undefined]'}`,
     );
     return {
       store: redisStore,

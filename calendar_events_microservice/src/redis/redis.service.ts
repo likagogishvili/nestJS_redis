@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
+import { redisHostPort } from './constants/redi-port-host';
 
 @Injectable()
 export class RedisService {
-  private readonly redisClient = new Redis({ host: '127.0.0.1', port: 6379 });
+  private readonly redisClient = new Redis(redisHostPort);
 
   async setData(key: string, data: any) {
     await this.redisClient.set(key, JSON.stringify(data));

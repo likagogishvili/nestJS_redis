@@ -1,20 +1,25 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Injectable } from '@nestjs/common';
+import {
+  ClientProxy,
+  ClientProxyFactory,
+  Transport,
+} from '@nestjs/microservices';
 import Redis from 'ioredis';
+import { redisHostPort } from '../redis/constants/redis-host-port';
 
 @Injectable()
 export class RedisService {
-  constructor(
-    @Inject('CALENDAR_SERVICE') private readonly calendarClient: ClientProxy,
-  ) {}
+  constructor() {}
 
-  private readonly redisClient = new Redis({ host: '127.0.0.1', port: 6379 });
+  private readonly redisClient = new Redis(redisHostPort);
 
+  private readonly eventEmitter: ClientProxy = ClientProxyFactory.create({
+    transport: Transport.REDIS,
+    options: redisHostPort,
+  });
   async setData(key: string, data: any) {
     await this.redisClient.set(key, JSON.stringify(data));
-    this.calendarClient.emit('createCustomer', {
-      data,
-    });
+    this.eventEmitter.emit('createCustomer', { data });
 
     return { message: `Data stored in Redis under key '${key}'` };
   }
